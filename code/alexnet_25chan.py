@@ -14,7 +14,7 @@ import ipdb
 import numpy as np
 import tensorflow as tf
 
-from models import *
+from models_alexnet import *
 import transformations as xforms
 from optimization import get_optimal_image
 
@@ -29,8 +29,8 @@ def main():
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"] = FLAGS.gpu
 
-    channels_to_plot = np.arange(50)
-    fig, axes = plt.subplots(figsize=(20, 20), nrows=8, ncols=8)
+    channels_to_plot = np.arange(25)
+    fig, axes = plt.subplots(figsize=(20, 20), nrows=5, ncols=5)
 
     params = {
         'channel': 1,
@@ -40,16 +40,16 @@ def main():
     }
 
     layer_names = [
-        'conv1',
-        'conv2',
+        #'conv1',
+        #'conv2',
         'conv3',
         'conv4',
         'conv5',
     ]
 
     tensor_names = [
-        'conv',
-        'conv_1',
+        #'conv',
+        #'conv_1',
         'conv_2',
         'conv_3',
         'conv_4',
@@ -79,7 +79,7 @@ def main():
             ax.imshow(optimal_image)
             ax.axis('off')
 
-        save_path = "%s/alexnet_%s_50channels.png" % (SAVE_PATH, layer_name)
+        save_path = "%s/alexnet_%s_25channels.png" % (SAVE_PATH, layer_name)
         plt.savefig(save_path, dpi=300)
 
 if __name__ == "__main__":

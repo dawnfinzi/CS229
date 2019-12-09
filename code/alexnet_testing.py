@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import os
 import argparse
 
-from models import *
+from models_alexnet import *
 
 import ipdb
 import numpy as np

@@ -14,7 +14,7 @@ import ipdb
 import numpy as np
 import tensorflow as tf
 
-from models import *
+from models_alexnet import *
 import transformations as xforms
 from optimization import get_optimal_image
 
