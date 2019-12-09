@@ -1,15 +1,18 @@
 """
-Actual optimization utilities
+Optimization utilities
 
-Credit to Eshed Margalit
+Initial credit to Eshed Margalit
+Edited by Dawn Finzi 12/2019
 """
 
 import ipdb
 import tensorflow as tf
 import numpy as np
 
-from imageopt.utils.plot_utils import norm_image
-import imageopt.utils.transformations as xforms
+import transformations as xforms
+
+def norm_image(x):
+    return (x - np.min(x))/np.ptp(x)
 
 def total_variation_loss(image_tensor):
     """
@@ -32,6 +35,7 @@ def get_optimal_image(
     model_kwargs,
     checkpoint_path,
     params,
+    loss=None,
     layer_name=None,
     image_resolution=128,
     unit_index=None
@@ -48,6 +52,8 @@ def get_optimal_image(
             - "learning rate"
             - "regularization"
             - "steps": how many steps to run for
+        loss (str): what loss function to use (default is just L2 regulariation). 
+            Currently, only TV loss is implemented otherwise.
         image_resolution (int): how many pixels to make the image on each side
         unit_index ([row, col]): if None, optimizes for whole channel. If not None,
             optimizes only for that unit.
@@ -95,8 +101,11 @@ def get_optimal_image(
             target = layer[0, params['channel']]
 
     # set up loss function
-    tv_loss = total_variation_loss(images)
-    total_reg = tf.reduce_sum(tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES)) + tv_loss
+    if loss is None:
+        total_reg = tf.reduce_sum(tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES))
+    else:
+        tv_loss = total_variation_loss(images)
+        total_reg = tf.reduce_sum(tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES)) + tv_loss
     loss_tensor = tf.negative(tf.reduce_mean(target)) + total_reg
 
     # set up optimizer
