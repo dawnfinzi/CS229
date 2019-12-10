@@ -74,18 +74,17 @@ def get_optimal_image(
     scales = [1 + (i - 5) / 50. for i in range(11)]
     angles = list(range(-10, 11)) + 5 * [0]
 
-    images = xforms.pad(images, pad_amount=12)
-    images = xforms.jitter(images, jitter_amount=8)
-    images = xforms.random_scale(images, scales)
-    images = xforms.random_rotate(images, angles)
-    images = xforms.jitter(images, jitter_amount=4)
+    #images = xforms.pad(images, pad_amount=12)
+    #images = xforms.jitter(images, jitter_amount=8)
+    #images = xforms.random_scale(images, scales)
+    #images = xforms.random_rotate(images, angles)
+    #images = xforms.jitter(images, jitter_amount=4)
 
     # get features for a given layer from a given model
     tensor_name = params.get('tensor_name', None)
 
     layer = model_fn(images, layer_name=layer_name, tensor_name=tensor_name, **model_kwargs)
     
-
     # initialize all variables except for 'images'
     sess = tf.Session()
 
@@ -121,23 +120,23 @@ def get_optimal_image(
     train_op = tf.train.AdamOptimizer(lr_tensor).minimize(loss_tensor, var_list=train_vars)
 
     # initialize session and all variables, restore model weights
-    # sess.run(tf.initialize_variables([images]))
-    sess.run(tf.global_variables_initializer())
-
-    # use meta path if specified
-    if meta_path is not None:
-    	temp_saver = tf.train.import_meta_graph(meta_path)
-    #print(temp_saver)
-    #print(tf.train.import_meta_graph(meta_path))
+    #sess.run(tf.initialize_variables([images]))
+    #sess.run(tf.global_variables_initializer())
 
     #all_variables = tf.get_collection_ref(tf.GraphKeys.GLOBAL_VARIABLES)
 
-    #temp_saver = tf.train.Saver(
-	#var_list=[v for v in all_variables if "images" not in v.name and "beta" not in v.name]
-    #)
+    # use meta path if specified
+    if meta_path is not None:
 
-    temp_saver.restore(sess, checkpoint_path)
+        temp_saver = tf.train.import_meta_graph(meta_path)
+        temp_saver.restore(sess, checkpoint_path)
+    else:
+        temp_saver = tf.train.Saver(
+            var_list=[v for v in all_variables if "images" not in v.name and "beta" not in v.name]
+        )
+        temp_saver.restore(sess, checkpoint_path)
 
+    sess.run(tf.global_variables_initializer())
     ## Main Loop
     for i in range(params['steps']):
         sess.run(train_op)

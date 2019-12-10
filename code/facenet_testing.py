@@ -31,45 +31,53 @@ def main():
 	layer_params = {
 		'Conv2d_1a_3x3': {
 		    'channel': 0,
-		    'learning_rate': 0.05,
+		    'learning_rate': 1e-3,
 		    'regularization': 0.0001,
-		    'steps': 2048,
+		    'steps': 1000,
 		    'tensor_name': 'Conv2d_1a_3x3',
 		},
 		'Conv2d_2a_3x3': {
 		    'channel': 0,
-		    'learning_rate': 0.05,
+		    'learning_rate': 1e-3,
 		    'regularization': 0.0001,
-		    'steps': 2048,
+		    'steps': 1000,
 		    'tensor_name': 'Conv2d_2a_3x3',
 		},
 		'Conv2d_2b_3x3': {
 		    'channel': 0,
-		    'learning_rate': 0.05,
+		    'learning_rate': 1e-2,
 		    'regularization': 0.0001,
-		    'steps': 2048,
+		    'steps': 1000,
 		    'tensor_name': 'Conv2d_2b_3x3',
 		},
 		'Conv2d_3b_1x1': {
 		    'channel': 0,
-		    'learning_rate': 0.05,
+		    'learning_rate': 1e-3,
 		    'regularization': 0.0001,
-		    'steps': 2048,
+		    'steps': 1000,
 		    'tensor_name': 'Conv2d_3b_1x1',
 		},
 		'Conv2d_4a_3x3': {
 		    'channel': 0,
-		    'learning_rate': 0.05,
+		    'learning_rate': 1e-3,
 		    'regularization': 0.0001,
-		    'steps': 2048,
+		    'steps': 1000,
 		    'tensor_name': 'Conv2d_4a_3x3',
 		},
-		'Conv2d_4b_3x3': {
+		'Mixed_6a': {
 		    'channel': 0,
-		    'learning_rate': 0.05,
+		    'learning_rate': 1e-3,
 		    'regularization': 0.0001,
-		    'steps': 2048,
-		    'tensor_name': 'Conv2d_4b_3x3',
+		    'steps': 1000,
+		    'tensor_name': 'Mixed_6a',
+		}
+		,
+		'Mixed_6b': {
+		    'channel': 0,
+		    'learning_rate': 1e-3,
+		    'regularization': 0.0001,
+		    'steps': 1000,
+		    'tensor_name': 'Mixed_6b',
 		}
 	    }
 
@@ -79,7 +87,8 @@ def main():
 		'Conv2d_2b_3x3',
 		'Conv2d_3b_1x1',
 		'Conv2d_4a_3x3',
-		'Conv2d_4b_3x3'
+		'Mixed_6a',
+		'Mized_6b'
 	]
 
 	facenet_kwargs = {
@@ -104,7 +113,7 @@ def main():
 		ax.axis('off')
 		ax.set_title(layer_name)
 
-	save_path = "%s/facenet_testing.png" % SAVE_PATH
+	save_path = "%s/facenet_testing_norotate_lowlr.png" % SAVE_PATH
 	plt.savefig(save_path, dpi=200)
 
 	#inputs = tf.convert_to_tensor(np.random.rand(5, 128, 128, 3))

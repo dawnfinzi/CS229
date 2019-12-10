@@ -58,13 +58,6 @@ def main():
             'steps': 2048,
             'tensor_name': 'conv_3',
         },
-        'conv5': {
-            'channel': 6,
-            'learning_rate': 0.05,
-            'regularization': 0.0001,
-            'steps': 2048,
-            'tensor_name': 'conv_4',
-        },
     }
 
         #     'channel': 1,
@@ -121,8 +114,7 @@ def main():
         'conv1',
         'conv2',
         'conv3',
-        'conv4',
-        'conv5'
+        'conv4'
         # ,
         # 'fc6',
         # 'fc7',
@@ -149,7 +141,7 @@ def main():
         ax.axis('off')
         ax.set_title(layer_name)
 
-    plt.savefig("%s/alexnet_preproc.png" % SAVE_PATH, dpi=200)
+    plt.savefig("%s/alexnet_preproc_testing.png" % SAVE_PATH, dpi=200)
 
 def optimization(
     model_fn,
@@ -220,7 +212,8 @@ def optimization(
 
     all_variables = tf.get_collection_ref(tf.GraphKeys.GLOBAL_VARIABLES)
     temp_saver = tf.train.Saver(
-        var_list=[v for v in all_variables if "images" not in v.name and "beta" not in v.name]
+        all_variables
+        #var_list=[v for v in all_variables if "images" not in v.name and "beta" not in v.name]
     )
     temp_saver.restore(sess, checkpoint_path)
 

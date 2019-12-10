@@ -107,5 +107,6 @@ def facenet_wrapper(images, layer_name, **kwargs):
 
 def facenet_no_fc_wrapper(images, layer_name, **kwargs):
     net, model_outputs = inception_resnet_v1_opt(images, is_training=False)
+    print(model_outputs)
     layer = model_outputs[layer_name]
     return layer
