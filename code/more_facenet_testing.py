@@ -7,7 +7,7 @@ import os
 import argparse
 import ipdb
 import sys
-import pprint
+from pprint import pprint
 
 import tensorflow as tf
 import numpy as np
@@ -19,6 +19,9 @@ from models_facenet import *
 
 import transformations as xforms
 from optimization import get_optimal_image
+
+import importlib
+
 
 # set paths
 META_PATH = "/share/kalanit/Projects/Dawn/CS229/models/facenet/facenet_checkpoint/model-20180402-114759.meta"
@@ -49,21 +52,19 @@ def main():
 	# 		save_path = "%s/facenet_weights.png" % SAVE_PATH
 	# 		plt.savefig(save_path, dpi=200)		
 
-
-    #inputs = tf.convert_to_tensor(np.random.rand(1, 128, 128, 3))
-	#net, endpoints = inception_resnet_v1(
-	#	inputs, is_training=False)
 	sess = tf.Session()
 
 	saver = tf.train.import_meta_graph(META_PATH)
 	saver.restore(sess, CKPT_PATH)
 
-	#sess.run(tf.global_variables_initializer())
-	#sess.run(tf.local_variables_initializer())
+	#print(tf.trainable_variables())
+	#nodes = [n.name for n in tf.get_default_graph().as_graph_def().node]
+	#pprint(nodes)
 
 	weights_tensor = tf.get_default_graph().get_tensor_by_name("InceptionResnetV1/Conv2d_1a_3x3/weights:0")
 	weights = sess.run(weights_tensor)
 	print(weights.shape)
+	print(weights[0,0,0,0])
 
 	weights = np.moveaxis(weights, 3, 0)
 	fig, axes = plt.subplots(figsize=(24, 16), nrows=4, ncols=8)

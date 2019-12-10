@@ -30,10 +30,10 @@ def main():
 
 	layer_params = {
 		'Conv2d_1a_3x3': {
-		    'channel': 0,
+		    'channel': 7,
 		    'learning_rate': 1e-3,
 		    'regularization': 0.0001,
-		    'steps': 1000,
+		    'steps': 500,
 		    'tensor_name': 'Conv2d_1a_3x3',
 		},
 		'Conv2d_2a_3x3': {
@@ -42,53 +42,53 @@ def main():
 		    'regularization': 0.0001,
 		    'steps': 1000,
 		    'tensor_name': 'Conv2d_2a_3x3',
-		},
-		'Conv2d_2b_3x3': {
-		    'channel': 0,
-		    'learning_rate': 1e-2,
-		    'regularization': 0.0001,
-		    'steps': 1000,
-		    'tensor_name': 'Conv2d_2b_3x3',
-		},
-		'Conv2d_3b_1x1': {
-		    'channel': 0,
-		    'learning_rate': 1e-3,
-		    'regularization': 0.0001,
-		    'steps': 1000,
-		    'tensor_name': 'Conv2d_3b_1x1',
-		},
-		'Conv2d_4a_3x3': {
-		    'channel': 0,
-		    'learning_rate': 1e-3,
-		    'regularization': 0.0001,
-		    'steps': 1000,
-		    'tensor_name': 'Conv2d_4a_3x3',
-		},
-		'Mixed_6a': {
-		    'channel': 0,
-		    'learning_rate': 1e-3,
-		    'regularization': 0.0001,
-		    'steps': 1000,
-		    'tensor_name': 'Mixed_6a',
-		}
-		,
-		'Mixed_6b': {
-		    'channel': 0,
-		    'learning_rate': 1e-3,
-		    'regularization': 0.0001,
-		    'steps': 1000,
-		    'tensor_name': 'Mixed_6b',
-		}
+		} #,
+		# 'Conv2d_2b_3x3': {
+		#     'channel': 0,
+		#     'learning_rate': 1e-2,
+		#     'regularization': 0.0001,
+		#     'steps': 1000,
+		#     'tensor_name': 'Conv2d_2b_3x3',
+		# },
+		# 'Conv2d_3b_1x1': {
+		#     'channel': 0,
+		#     'learning_rate': 1e-3,
+		#     'regularization': 0.0001,
+		#     'steps': 1000,
+		#     'tensor_name': 'Conv2d_3b_1x1',
+		# },
+		# 'Conv2d_4a_3x3': {
+		#     'channel': 0,
+		#     'learning_rate': 1e-3,
+		#     'regularization': 0.0001,
+		#     'steps': 1000,
+		#     'tensor_name': 'Conv2d_4a_3x3',
+		# },
+		# 'Mixed_6a': {
+		#     'channel': 0,
+		#     'learning_rate': 1e-3,
+		#     'regularization': 0.0001,
+		#     'steps': 1000,
+		#     'tensor_name': 'Mixed_6a',
+		# }
+		# ,
+		# 'Mixed_6b': {
+		#     'channel': 0,
+		#     'learning_rate': 1e-3,
+		#     'regularization': 0.0001,
+		#     'steps': 1000,
+		#     'tensor_name': 'Mixed_6b',
+		# }
 	    }
 
 	keys = [
-		'Conv2d_1a_3x3',
-		'Conv2d_2a_3x3',
-		'Conv2d_2b_3x3',
-		'Conv2d_3b_1x1',
-		'Conv2d_4a_3x3',
-		'Mixed_6a',
-		'Mized_6b'
+		'Conv2d_1a_3x3' ,
+		'Conv2d_2a_3x3' #,
+		# 'Conv2d_2b_3x3',
+		# 'Conv2d_3b_1x1',
+		# 'Conv2d_4a_3x3',
+		# 'Mixed_6a',
+		# 'Mized_6b'
 	]
 
 	facenet_kwargs = {
@@ -101,7 +101,7 @@ def main():
 	for layer_name, ax in zip(keys, axes.ravel()):
 		layer_dict = layer_params[layer_name]
 		optimal_image = get_optimal_image(
-		    facenet_no_fc_wrapper,
+		    facenet_wrapper,
 		    facenet_kwargs,
 		    CKPT_PATH,
 		    layer_dict,
@@ -113,25 +113,8 @@ def main():
 		ax.axis('off')
 		ax.set_title(layer_name)
 
-	save_path = "%s/facenet_testing_norotate_lowlr.png" % SAVE_PATH
+	save_path = "%s/facenet_testing_weightfail.png" % SAVE_PATH
 	plt.savefig(save_path, dpi=200)
-
-	#inputs = tf.convert_to_tensor(np.random.rand(5, 128, 128, 3))
-	#net, endpoints = inception_resnet_v1(
-	#	inputs, is_training=False)
-	#pprint.pprint(net)
-	#pprint.pprint(endpoints)
-
-	#saver = tf.train.import_meta_graph(META_PATH)
-        #sess = tf.Session()
-        #saver.restore(sess, CKPT_PATH)
-
-	#sess.run(tf.global_variables_initializer())
-	#sess.run(tf.local_variables_initializer())
-	#conv2d_4b_3x3 = sess.run(endpoints['Conv2d_4b_3x3'])
-
-	#print(conv2d_4b_3x3.shape)
-	#print(conv2d_4b_3x3[0, 10, 10, :])
 		
 
 if __name__ == "__main__":

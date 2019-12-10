@@ -8,6 +8,7 @@ Edited by Dawn Finzi 12/2019
 import ipdb
 import tensorflow as tf
 import numpy as np
+from pprint import pprint
 
 import transformations as xforms
 
@@ -84,6 +85,7 @@ def get_optimal_image(
     tensor_name = params.get('tensor_name', None)
 
     layer = model_fn(images, layer_name=layer_name, tensor_name=tensor_name, **model_kwargs)
+    print(layer)
     
     # initialize all variables except for 'images'
     sess = tf.Session()
@@ -127,16 +129,31 @@ def get_optimal_image(
 
     # use meta path if specified
     if meta_path is not None:
-
         temp_saver = tf.train.import_meta_graph(meta_path)
+    	sess = tf.Session()
+	#graph = tf.get_default_graph()
+	#weights_tensor = graph.get_tensor_by_name("InceptionResnetV1/Conv2d_1a_3x3/weights:0")
+
         temp_saver.restore(sess, checkpoint_path)
+
+
+	#nodes = [n.name for n in tf.get_default_graph().as_graph_def().node if 'Conv2d_1a_3x3' in n.name]
+
+	#pprint(nodes)
+
+        weights_tensor = tf.get_default_graph().get_tensor_by_name("InceptionResnetV1/Conv2d_1a_3x3/weights:0")
+        print(weights_tensor)
+        #sess.run(tf.initialize_variables([weights_tensor]))
+        weights = sess.run(weights_tensor)
+        print(weights[0,0,0,0])
     else:
         temp_saver = tf.train.Saver(
             var_list=[v for v in all_variables if "images" not in v.name and "beta" not in v.name]
         )
         temp_saver.restore(sess, checkpoint_path)
 
-    sess.run(tf.global_variables_initializer())
+    #sess.run(tf.global_variables_initializer())
+
     ## Main Loop
     for i in range(params['steps']):
         sess.run(train_op)
