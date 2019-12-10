@@ -38,7 +38,8 @@ def get_optimal_image(
     loss=None,
     layer_name=None,
     image_resolution=128,
-    unit_index=None
+    unit_index=None,
+    meta_path=None,
 ):
     """
     Does gradient ascent to get the optimal image for a given model
@@ -81,7 +82,9 @@ def get_optimal_image(
 
     # get features for a given layer from a given model
     tensor_name = params.get('tensor_name', None)
+
     layer = model_fn(images, layer_name=layer_name, tensor_name=tensor_name, **model_kwargs)
+    
 
     # initialize all variables except for 'images'
     sess = tf.Session()
@@ -121,10 +124,18 @@ def get_optimal_image(
     # sess.run(tf.initialize_variables([images]))
     sess.run(tf.global_variables_initializer())
 
-    all_variables = tf.get_collection_ref(tf.GraphKeys.GLOBAL_VARIABLES)
-    temp_saver = tf.train.Saver(
-        var_list=[v for v in all_variables if "images" not in v.name and "beta" not in v.name]
-    )
+    # use meta path if specified
+    if meta_path is not None:
+    	temp_saver = tf.train.import_meta_graph(meta_path)
+    #print(temp_saver)
+    #print(tf.train.import_meta_graph(meta_path))
+
+    #all_variables = tf.get_collection_ref(tf.GraphKeys.GLOBAL_VARIABLES)
+
+    #temp_saver = tf.train.Saver(
+	#var_list=[v for v in all_variables if "images" not in v.name and "beta" not in v.name]
+    #)
+
     temp_saver.restore(sess, checkpoint_path)
 
     ## Main Loop
