@@ -37,10 +37,10 @@ def get_optimal_image(
     checkpoint_path,
     params,
     loss=None,
+    preproc=True,
     layer_name=None,
     image_resolution=128,
     unit_index=None,
-    meta_path=None,
 ):
     """
     Does gradient ascent to get the optimal image for a given model
@@ -56,13 +56,13 @@ def get_optimal_image(
             - "steps": how many steps to run for
         loss (str): what loss function to use (default is just L2 regulariation). 
             Currently, only TV loss is implemented otherwise.
+        preproc (bool): whether or not to preprocess the images ala lucid (default is True)
         image_resolution (int): how many pixels to make the image on each side
         unit_index ([row, col]): if None, optimizes for whole channel. If not None,
             optimizes only for that unit.
     Outputs
         optimal image (224 x 224 x 3)
     """
-
     # set up model
     tf.reset_default_graph()
     init = tf.random_uniform_initializer(minval=0, maxval=1)
@@ -75,18 +75,17 @@ def get_optimal_image(
     scales = [1 + (i - 5) / 50. for i in range(11)]
     angles = list(range(-10, 11)) + 5 * [0]
 
-    #images = xforms.pad(images, pad_amount=12)
-    #images = xforms.jitter(images, jitter_amount=8)
-    #images = xforms.random_scale(images, scales)
-    #images = xforms.random_rotate(images, angles)
-    #images = xforms.jitter(images, jitter_amount=4)
+    if preproc is True:
+        images = xforms.pad(images, pad_amount=12)
+        images = xforms.jitter(images, jitter_amount=8)
+        images = xforms.random_scale(images, scales)
+        images = xforms.random_rotate(images, angles)
+        images = xforms.jitter(images, jitter_amount=4)
 
     # get features for a given layer from a given model
     tensor_name = params.get('tensor_name', None)
-
     layer = model_fn(images, layer_name=layer_name, tensor_name=tensor_name, **model_kwargs)
-    print(layer)
-    
+
     # initialize all variables except for 'images'
     sess = tf.Session()
 
@@ -122,37 +121,14 @@ def get_optimal_image(
     train_op = tf.train.AdamOptimizer(lr_tensor).minimize(loss_tensor, var_list=train_vars)
 
     # initialize session and all variables, restore model weights
-    #sess.run(tf.initialize_variables([images]))
-    #sess.run(tf.global_variables_initializer())
+    # sess.run(tf.initialize_variables([images]))
+    sess.run(tf.global_variables_initializer())
 
-    #all_variables = tf.get_collection_ref(tf.GraphKeys.GLOBAL_VARIABLES)
-
-    # use meta path if specified
-    if meta_path is not None:
-        temp_saver = tf.train.import_meta_graph(meta_path)
-    	sess = tf.Session()
-	#graph = tf.get_default_graph()
-	#weights_tensor = graph.get_tensor_by_name("InceptionResnetV1/Conv2d_1a_3x3/weights:0")
-
-        temp_saver.restore(sess, checkpoint_path)
-
-
-	#nodes = [n.name for n in tf.get_default_graph().as_graph_def().node if 'Conv2d_1a_3x3' in n.name]
-
-	#pprint(nodes)
-
-        weights_tensor = tf.get_default_graph().get_tensor_by_name("InceptionResnetV1/Conv2d_1a_3x3/weights:0")
-        print(weights_tensor)
-        #sess.run(tf.initialize_variables([weights_tensor]))
-        weights = sess.run(weights_tensor)
-        print(weights[0,0,0,0])
-    else:
-        temp_saver = tf.train.Saver(
-            var_list=[v for v in all_variables if "images" not in v.name and "beta" not in v.name]
-        )
-        temp_saver.restore(sess, checkpoint_path)
-
-    #sess.run(tf.global_variables_initializer())
+    all_variables = tf.get_collection_ref(tf.GraphKeys.GLOBAL_VARIABLES)
+    temp_saver = tf.train.Saver(
+        var_list=[v for v in all_variables if "images" not in v.name and "beta" not in v.name]
+    )
+    temp_saver.restore(sess, checkpoint_path)
 
     ## Main Loop
     for i in range(params['steps']):

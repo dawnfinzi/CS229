@@ -2,8 +2,10 @@
 Defines CNN architectures
 (Credit to Eshed Margalit)
 """
-
+import ipdb
 import os
+import sys
+sys.path.append('../models/')
 from tnn import main as tnn_main
 import tensorflow as tf
 

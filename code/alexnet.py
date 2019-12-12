@@ -91,6 +91,7 @@ def main():
             loss,
             layer_name=None,
         )
+        ipdb.set_trace()
         ax.imshow(optimal_image)
         ax.axis('off')
         ax.set_title(layer_name)

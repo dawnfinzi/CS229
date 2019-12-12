@@ -1,7 +1,7 @@
 import os
 import sys
 sys.path.append('../models/')
-from facenet.src.models.inception_resnet_v1 import *
+from facenet.src.models.inception_resnet_v1 import inception_resnet_v1
 
 def inception_resnet_v1_opt(inputs, is_training=True,
                         dropout_keep_prob=0.8,
@@ -101,12 +101,12 @@ def inception_resnet_v1_opt(inputs, is_training=True,
 
 def facenet_wrapper(images, layer_name, **kwargs):
     print(layer_name)
-    net, model_outputs = inception_resnet_v1(images, is_training=False)
+    net, model_outputs = inception_resnet_v1(images, is_training=False)#,reuse=tf.AUTO_REUSE)
     layer = model_outputs[layer_name]
     return layer
 
 def facenet_no_fc_wrapper(images, layer_name, **kwargs):
-    net, model_outputs = inception_resnet_v1_opt(images, is_training=False)
+    net, model_outputs = inception_resnet_v1_opt(images, is_training=False)#,reuse=tf.AUTO_REUSE)
     print(model_outputs)
     layer = model_outputs[layer_name]
     return layer

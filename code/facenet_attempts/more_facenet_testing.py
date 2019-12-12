@@ -58,8 +58,7 @@ def main():
 	saver.restore(sess, CKPT_PATH)
 
 	#print(tf.trainable_variables())
-	#nodes = [n.name for n in tf.get_default_graph().as_graph_def().node]
-	#pprint(nodes)
+
 
 	weights_tensor = tf.get_default_graph().get_tensor_by_name("InceptionResnetV1/Conv2d_1a_3x3/weights:0")
 	weights = sess.run(weights_tensor)
