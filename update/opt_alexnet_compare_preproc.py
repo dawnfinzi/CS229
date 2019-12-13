@@ -101,6 +101,28 @@ def main():
 
     # run the tensors
     score = sess.run(fc8_outputs)
+    # apply softmax to output
+    probs = np.zeros((score.shape))
+    for col in range(len(score)): #ugly but works
+        probs[col,:] = softmax(score[col,:])
+    winning_class = (np.argmax(probs,1)) #top 1
+    print(winning_class)
+    # get top 5 and compute overlap
+    top_5 = np.argpartition(probs, -5,axis=1)[:,-5:]
+    total = len(np.ravel(top_5))
+    no_repeats = len(np.unique(top_5))
+    overlap = total-no_repeats
+    print(total)
+    print(overlap)
+    print((overlap/total)*100) #percent overlap
+
+    # visualize the probs across repeats
+    plt.figure(figsize = (20, 2))
+    plt.imshow(probs)
+    save_path = "%s/alexnet_repeats_visualize_class_probs.png" % (SAVE_PATH)
+    plt.savefig(save_path, dpi=200)
+    # run the tensors
+    score = sess.run(fc8_outputs)
     winning_class = (np.argmax(score,1))
     print(winning_class)
     top_5 = np.argpartition(score, -5,axis=1)[:,-5:]

@@ -24,7 +24,7 @@ from utils import *
 CKPT_PATH = "/share/kalanit/Projects/Dawn/CS229/models/checkpoints/alexnet/model.ckpt-115000"
 SAVE_PATH = "/share/kalanit/Projects/Dawn/CS229/figures"
 
-iterations = 2
+iterations = 25
 
 def main():
     print("Using GPU %s" % FLAGS.gpu)
@@ -56,7 +56,7 @@ def main():
     layer_name = keys[0]
     layer_dict = layer_params[layer_name]
 
-    fig, axes = plt.subplots(figsize=(20, 20), nrows=2, ncols=1) #nrows=5, ncols=5)
+    fig, axes = plt.subplots(figsize=(20, 20), nrows=5, ncols=5)
 
     for its, ax in enumerate(fig.axes):
         optimal_image, loss_list = get_optimal_image(
@@ -92,23 +92,29 @@ def main():
 
     # run the tensors
     score = sess.run(fc8_outputs)
-    winning_class = (np.argmax(score,1))
+    # apply softmax to output
+    probs = np.zeros((score.shape))
+    for col in range(len(score)): #ugly but works
+        probs[col,:] = softmax(score[col,:])
+    winning_class = (np.argmax(probs,1)) #top 1
     print(winning_class)
-    top_5 = np.argpartition(score, -5,axis=1)[:,-5:]
+    # get top 5 and compute overlap
+    top_5 = np.argpartition(probs, -5,axis=1)[:,-5:]
     total = len(np.ravel(top_5))
     no_repeats = len(np.unique(top_5))
     overlap = total-no_repeats
-    ipdb.set_trace()
     print(total)
     print(overlap)
     print((overlap/total)*100) #percent overlap
-    plt.figure(figsize = (20, 2))
-    plt.imshow(score)
-    save_path = "%s/alexnet_repeats_visualize_class_scores.png" % (SAVE_PATH)
+
+    # visualize the probs across repeats
+    plt.figure(figsize = (20, 5))
+    plt.imshow(probs)
+    save_path = "%s/alexnet_repeats_visualize_class_probs.png" % (SAVE_PATH)
     plt.savefig(save_path, dpi=200)
 
     #get one spearman's rho as a baseline
-    baseline_rho = spearmanr(np.argsort(score[0]),np.argsort(score[1]))
+    baseline_rho = spearmanr(np.argsort(probs[0]),np.argsort(probs[1]))
     print(baseline_rho)
 
 
