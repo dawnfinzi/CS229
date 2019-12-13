@@ -36,8 +36,8 @@ def main():
         'learning_rate': .05,
         'regularization': 0.0001,
         'steps': 1000,
-        'loss': 'TV',
-        'loss_lambda': 1.0,
+        #'loss': 'TV',
+        #'loss_lambda': 1.0,
     }
 
     layer_names = [
@@ -60,7 +60,7 @@ def main():
         'train': False
     }
 
-    loss = 'TV'
+    loss = None #'TV'
     preproc = True
 
     for layer_name, tensor_name in zip(layer_names, tensor_names):

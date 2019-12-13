@@ -56,8 +56,8 @@ def main():
     }
 
     # setup optional inputs 
-    loss = 'TV'
     preproc = False
+    loss = None
 
     ## Run imageopt
     layer_dict = layer_params['conv1']
@@ -66,7 +66,6 @@ def main():
             alexnet_kwargs,
             CKPT_PATH,
             layer_dict,
-            loss,
             preproc,
             layer_name=None,
         )
@@ -88,7 +87,7 @@ def main():
     weights = sess.run(weights_tensor)
     
     ## Plot
-    fig, (ax1, ax2, ax3) = plt.subplots(figsize=(15, 5), nrows=1, ncols=3)
+    fig, (ax1, ax2, ax3) = plt.subplots(figsize=(17, 5), nrows=1, ncols=3)
     title = "AlexNet sanity check: Channel %d" % (channel)
     fig.suptitle(title)
 

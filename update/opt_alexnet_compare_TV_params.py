@@ -29,7 +29,7 @@ def main():
     os.environ["CUDA_VISIBLE_DEVICES"] = FLAGS.gpu
 
     scalars_to_plot = np.arange(0.0,1.0,.1)
-    fig, axes = plt.subplots(figsize=(20, 5), nrows=2, ncols=5)
+    fig, axes = plt.subplots(figsize=(15, 5), nrows=2, ncols=5)
 
     params = {
                 'channel': 1,
@@ -74,7 +74,7 @@ def main():
                 layer_name=None,
             )
             ax.imshow(optimal_image)
-            ax.set_title(str(loss_lambda))
+            ax.set_title(str(round(loss_lambda,2)))
             ax.axis('off')
         
         save_path = "%s/alexnet_%s_TVloss_lambdas.png" % (SAVE_PATH, layer_name)

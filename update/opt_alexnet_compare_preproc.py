@@ -1,5 +1,5 @@
 """
-Compare the images optimized on different iterations
+Compare images optimized with and without preprocessing
 """
 
 # import packages
@@ -24,7 +24,6 @@ from utils import *
 CKPT_PATH = "/share/kalanit/Projects/Dawn/CS229/models/checkpoints/alexnet/model.ckpt-115000"
 SAVE_PATH = "/share/kalanit/Projects/Dawn/CS229/figures"
 
-iterations = 2
 
 def main():
     print("Using GPU %s" % FLAGS.gpu)
@@ -33,17 +32,17 @@ def main():
     os.environ["CUDA_VISIBLE_DEVICES"] = FLAGS.gpu
 
     layer_params = {
-        'conv5': {
-            'channel': 6,
+        'conv4': {
+            'channel': 0,
             'learning_rate': 0.05,
             'regularization': 0.0001,
             'steps': 500,
-            'tensor_name': 'conv_4',
+            'tensor_name': 'conv_3',
             'loss': 'TV',
         },
     }
     keys = [
-        'conv5',
+        'conv4',
     ]
 
     alexnet_kwargs = {
@@ -52,14 +51,14 @@ def main():
 
     loss = 'TV'
 
-    images = np.zeros((iterations, 128, 128, 3))
     layer_name = keys[0]
     layer_dict = layer_params[layer_name]
 
-    fig, axes = plt.subplots(figsize=(20, 20), nrows=2, ncols=1) #nrows=5, ncols=5)
+    fig, (ax1, ax2) = plt.subplots(figsize=(10, 5), nrows=1, ncols=2)
+    title = "Differences from preprocessing choices" 
+    fig.suptitle(title)
 
-    for its, ax in enumerate(fig.axes):
-        optimal_image, loss_list = get_optimal_image(
+    optimal_image_no_preproc, loss_list = get_optimal_image(
             alexnet_no_fc_wrapper,
             alexnet_kwargs,
             CKPT_PATH,
@@ -67,22 +66,32 @@ def main():
             preproc=False,
             layer_name=None,
         )
-        print(its)
-        images[its,:,:,:] = optimal_image
+    ax1.imshow(optimal_image_no_preproc)
+    ax1.set_title("No preprocessing")
 
-        ax.imshow(optimal_image)
-        ax.axis('off')
-
-    save_path = "%s/alexnet_repeat_testing%d.png" % (SAVE_PATH,iterations)
+    optimal_image_preproc, loss_list = get_optimal_image(
+            alexnet_no_fc_wrapper,
+            alexnet_kwargs,
+            CKPT_PATH,
+            layer_dict,
+            preproc=True,
+            layer_name=None,
+        )
+    ax2.imshow(optimal_image_preproc)
+    ax2.set_title("With preprocessing")
+    save_path = "%s/alexnet_preproc_diffs_conv4.png" % (SAVE_PATH)
     plt.savefig(save_path, dpi=200)
 
     # now convert the images to a tensor and resize
     tf.reset_default_graph()
-    image_tensor = tf.convert_to_tensor(images, dtype=tf.float32)
-    #resize for alexnet
-    resized_images = tf.image.resize_images(image_tensor, (224, 224))
+    # resize and stack the images
+    image_tensor_no_preproc = tf.convert_to_tensor(optimal_image_no_preproc, dtype=tf.float32)
+    npre = tf.image.resize_images(image_tensor_no_preproc, (224, 224))
+    image_tensor_preproc = tf.convert_to_tensor(optimal_image_preproc, dtype=tf.float32)
+    pre = tf.image.resize_images(image_tensor_preproc, (224, 224))
+    images = tf.stack([npre,pre])
     #initialize model
-    convnet = alexnet(resized_images, train=False)
+    convnet = alexnet(images, train=False)
     # define output tensors of interest
     fc8_outputs = convnet.layers['fc8']
     # initialize tf Session and restore weighs
@@ -98,18 +107,18 @@ def main():
     total = len(np.ravel(top_5))
     no_repeats = len(np.unique(top_5))
     overlap = total-no_repeats
-    ipdb.set_trace()
+    
     print(total)
     print(overlap)
     print((overlap/total)*100) #percent overlap
-    plt.figure(figsize = (20, 2))
-    plt.imshow(score)
-    save_path = "%s/alexnet_repeats_visualize_class_scores.png" % (SAVE_PATH)
+    plt.figure(figsize = (20, 5))
+    plt.imshow(score[:,1:100])
+    save_path = "%s/alexnet_repeats_visualize_preproc_scores_conv4.png" % (SAVE_PATH)
     plt.savefig(save_path, dpi=200)
 
-    #get one spearman's rho as a baseline
-    baseline_rho = spearmanr(np.argsort(score[0]),np.argsort(score[1]))
-    print(baseline_rho)
+    #compute spearman's rho
+    rho = spearmanr(np.argsort(score[0]),np.argsort(score[1]))
+    print(rho)
 
 
 if __name__ == "__main__":

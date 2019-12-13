@@ -9,4 +9,5 @@ def norm_image(x):
 
 def softmax(x):
     """Compute softmax values for each sets of scores in x."""
-    return np.exp(x) / np.sum(np.exp(x), axis=0)
+    exp = np.exp(x)
+    return exp/ exp.sum(0) #sums over axis representing columns
