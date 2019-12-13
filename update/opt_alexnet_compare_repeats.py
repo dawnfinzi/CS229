@@ -109,7 +109,10 @@ def main():
 
     # visualize the probs across repeats
     plt.figure(figsize = (20, 5))
-    plt.imshow(probs)
+    plt.imshow(score[:,1:100])
+    plt.set_ylabel('Repeats')
+    plt.set_xlabel('Class probabilities for the first 100 classes')
+    plt.set_title("Class probabilities across repeated optimizations")
     save_path = "%s/alexnet_repeats_visualize_class_probs.png" % (SAVE_PATH)
     plt.savefig(save_path, dpi=200)
 

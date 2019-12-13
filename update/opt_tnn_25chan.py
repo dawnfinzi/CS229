@@ -1,5 +1,5 @@
 """
-Optimize one image each for 25 channels in Alexnet pre RELU
+Optimize one image each for 25 channels in TNN
 """
 
 # import packages
@@ -14,12 +14,13 @@ import ipdb
 import numpy as np
 import tensorflow as tf
 
-from models_alexnet import *
+from models_tnn import *
 import transformations as xforms
 from opt_utils import get_optimal_image
 
 # set paths
-CKPT_PATH = "/share/kalanit/Projects/Dawn/CS229/models/checkpoints/alexnet/model.ckpt-115000"
+CKPT_PATH = "/share/kalanit/Projects/Dawn/CS229/models/checkpoints/tnn/model.ckpt-1940300"
+JSON_PATH = "/share/kalanit/Projects/Dawn/CS229/models/checkpoints/tnn/ff_128_neuralfit.json"
 SAVE_PATH = "/share/kalanit/Projects/Dawn/CS229/figures"
 
 def main():
@@ -31,13 +32,15 @@ def main():
     channels_to_plot = np.arange(25)
     fig, axes = plt.subplots(figsize=(20, 20), nrows=5, ncols=5)
 
+    preproc = False
+    loss = 'TV'
+
     params = {
         'channel': 1,
-        'learning_rate': .05,
+        'learning_rate': 0.05,
         'regularization': 0.0001,
-        'steps': 1000,
-        #'loss': 'TV',
-        #'loss_lambda': 1.0,
+        'steps': 2048,
+        'loss': loss,
     }
 
     layer_names = [
@@ -46,52 +49,45 @@ def main():
         'conv3',
         'conv4',
         'conv5',
+        'conv6',
+        'conv7',
+        'conv8',
+        'conv9',
+        'conv10',
     ]
 
-    tensor_names = [
-        'conv',
-        'conv_1',
-        'conv_2',
-        'conv_3',
-        'conv_4',
-    ]
-
-    alexnet_kwargs = {
-        'train': False
+    tnn_kwargs = {
+        'json_fpath': JSON_PATH,
+        'batch_size': 1,
     }
 
-    loss = None #'TV'
-    preproc = False
-
-    for layer_name, tensor_name in zip(layer_names, tensor_names):
-        print("Processing %s" % layer_name)
+    for layer_name in layer_names:
         for channel, ax in zip(channels_to_plot, axes.ravel()):
             print("Processing channel %d" % channel)
             params['channel'] = channel
-            params['tensor_name'] = tensor_name
             optimal_image, loss_list = get_optimal_image(
-                alexnet_no_fc_wrapper,
-                alexnet_kwargs,
+                tnn_no_fc_wrapper,
+                tnn_kwargs,
                 CKPT_PATH,
                 params,
                 preproc,
-                layer_name=None,
+                layer_name=layer_name,
             )
-
             ax.imshow(optimal_image)
             ax.axis('off')
 
         if preproc is True:
             if loss is None:
-                save_path = "%s/alexnet_%s_25channels_preproc.png" % (SAVE_PATH, layer_name)
+                save_path = "%s/TNN_%s_25channels_preproc.png" % (SAVE_PATH, layer_name)
             else: 
-                save_path = "%s/alexnet_%s_25channels_preproc_%sloss.png" % (SAVE_PATH, layer_name, loss)
+                save_path = "%s/TNN_%s_25channels_preproc_%sloss.png" % (SAVE_PATH, layer_name, loss)
         else:
             if loss is None:
-                save_path = "%s/alexnet_%s_25channels_nopreproc.png" % (SAVE_PATH, layer_name)
+                save_path = "%s/TNN_%s_25channels_nopreproc.png" % (SAVE_PATH, layer_name)
             else: 
-                save_path = "%s/alexnet_%s_25channels_nopreproc_%sloss.png" % (SAVE_PATH, layer_name, loss)
+                save_path = "%s/TNNt_%s_25channels_nopreproc_%sloss.png" % (SAVE_PATH, layer_name, loss)
 
+        print("Writing to %s" % save_path)
         plt.savefig(save_path, dpi=300)
 
 if __name__ == "__main__":

@@ -116,26 +116,9 @@ def main():
     print(overlap)
     print((overlap/total)*100) #percent overlap
 
-    # visualize the probs across repeats
-    plt.figure(figsize = (20, 2))
-    plt.imshow(probs)
-    save_path = "%s/alexnet_repeats_visualize_class_probs.png" % (SAVE_PATH)
-    plt.savefig(save_path, dpi=200)
-    # run the tensors
-    score = sess.run(fc8_outputs)
-    winning_class = (np.argmax(score,1))
-    print(winning_class)
-    top_5 = np.argpartition(score, -5,axis=1)[:,-5:]
-    total = len(np.ravel(top_5))
-    no_repeats = len(np.unique(top_5))
-    overlap = total-no_repeats
-    
-    print(total)
-    print(overlap)
-    print((overlap/total)*100) #percent overlap
     plt.figure(figsize = (20, 5))
     plt.imshow(score[:,1:100])
-    save_path = "%s/alexnet_repeats_visualize_preproc_scores_conv4.png" % (SAVE_PATH)
+    save_path = "%s/alexnet_repeats_visualize_preproc_score_conv4.png" % (SAVE_PATH)
     plt.savefig(save_path, dpi=200)
 
     #compute spearman's rho
