@@ -67,7 +67,7 @@ def main():
                 tnn_kwargs,
                 CKPT_PATH,
                 params,
-                loss = None,
+                loss = 'TV',
                 preproc = True,
                 layer_name=layer_name,
             )

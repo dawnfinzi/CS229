@@ -1,5 +1,5 @@
 """
-Compare the images optimizzed on different iterations
+Compare the images optimized on different iterations
 """
 
 # import packages
@@ -16,18 +16,14 @@ import tensorflow as tf
 
 from models_alexnet import *
 import transformations as xforms
-from optimization import get_optimal_image
+from opt_utils import get_optimal_image
+from utils import *
 
 # set paths
 CKPT_PATH = "/share/kalanit/Projects/Dawn/CS229/models/checkpoints/alexnet/model.ckpt-115000"
-alexnet_checkpoint_path = "/share/kalanit/Projects/Dawn/CS229/models/checkpoints/alexnet/model.ckpt-115000"
 SAVE_PATH = "/share/kalanit/Projects/Dawn/CS229/figures"
 
-iterations = 10
-
-def softmax(x):
-    """Compute softmax values for each sets of scores in x."""
-    return np.exp(x) / np.sum(np.exp(x), axis=0)
+iterations = 25
 
 def main():
     print("Using GPU %s" % FLAGS.gpu)
@@ -42,6 +38,7 @@ def main():
             'regularization': 0.0001,
             'steps': 500,
             'tensor_name': 'conv_4',
+            'loss': 'TV',
         },
     }
     keys = [
@@ -58,24 +55,25 @@ def main():
     layer_name = keys[0]
     layer_dict = layer_params[layer_name]
 
-    for its in range(iterations):
-        plt.figure()
-        optimal_image = get_optimal_image(
+    fig, axes = plt.subplots(figsize=(20, 20), nrows=5, ncols=5)
+
+    for its, ax in enumerate(fig.axes):
+        optimal_image, loss_list = get_optimal_image(
             alexnet_no_fc_wrapper,
             alexnet_kwargs,
-            alexnet_checkpoint_path,
+            CKPT_PATH,
             layer_dict,
-            loss,
             preproc=False,
             layer_name=None,
         )
         print(its)
         images[its,:,:,:] = optimal_image
 
-        if its <= 5:
-            plt.imshow(optimal_image)
-            save_path = "%s/alexnet_repeat_testing%d.png" % (SAVE_PATH,its)
-            plt.savefig(save_path, dpi=200)
+        ax.imshow(optimal_image)
+        ax.axis('off')
+
+    save_path = "%s/alexnet_repeat_testing%d.png" % (SAVE_PATH,iterations)
+    plt.savefig(save_path, dpi=200)
 
     # now convert the images to a tensor and resize
     tf.reset_default_graph()
@@ -98,8 +96,8 @@ def main():
     print(winning_class)
     top_5 = np.argpartition(probs, -5,axis=1)[:,-5:]
     total = len(np.ravel(top_5))
-    any_repeats = len(np.unique(top_5))
-    overlap = total-any_repeats
+    no_repeats = len(np.unique(top_5))
+    overlap = total-no_repeats
     
     print(total)
     print(overlap)
@@ -107,6 +105,17 @@ def main():
     plt.imshow(probs)
     save_path = "%s/alexnet_repeats_visualize_class_scores.png" % (SAVE_PATH)
     plt.savefig(save_path, dpi=200)
+    ipdb.set_trace()
+    print(probs.shape)
+
+    plt.figure(figsize=(12,5))
+    plt.subplot(1,2,1)
+    plt.imshow(1-np.corrcoef(probs))
+    plt.subplot(1,2,1)
+    plt.imshow(1-np.corrcoef(probs))
+    save_path = "%s/RSA_testing.png" % (SAVE_PATH)
+    plt.savefig(save_path, dpi=200)
+
 
 
 
