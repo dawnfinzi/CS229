@@ -1,5 +1,6 @@
 figures/
 models/
+_old/
 
 *.pyc
 *.swp
