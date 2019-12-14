@@ -116,7 +116,7 @@ def get_optimal_image(
     target = get_network_aspect(params, layer)
 
     # set up loss function
-    if 'loss' not in params: #loss is None:
+    if ('loss' not in params) or (params['loss'] is None): #loss is None:
         total_reg = tf.reduce_sum(tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES)) #basic L2 loss
     else:
         tv_loss = total_variation_loss(images)

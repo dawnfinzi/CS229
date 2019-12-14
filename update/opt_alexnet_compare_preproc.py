@@ -100,11 +100,11 @@ def main():
     tf_saver_restore.restore(sess, CKPT_PATH)
 
     # run the tensors
-    score = sess.run(fc8_outputs)
+    logits = sess.run(fc8_outputs)
     # apply softmax to output
-    probs = np.zeros((score.shape))
-    for col in range(len(score)): #ugly but works
-        probs[col,:] = softmax(score[col,:])
+    probs = np.zeros((logits.shape))
+    for col in range(len(logits)): #ugly but works
+        probs[col,:] = softmax(logits[col,:])
     winning_class = (np.argmax(probs,1)) #top 1
     print(winning_class)
     # get top 5 and compute overlap
@@ -116,13 +116,16 @@ def main():
     print(overlap)
     print((overlap/total)*100) #percent overlap
 
-    plt.figure(figsize = (20, 5))
-    plt.imshow(score[:,1:100])
-    save_path = "%s/alexnet_repeats_visualize_preproc_score_conv4.png" % (SAVE_PATH)
+    fig,ax = plt.subplots(figsize=(20, 2))
+    img = ax.imshow(logits[:,1:100])
+    ax.set_xlabel('Class logits for the first 100 classes')
+    ax.set_title("Class logits for optimization with and without preprocessing")
+    fig.colorbar(img, ax=ax)
+    save_path = "%s/alexnet_repeats_visualize_preproc_logits_conv4.png" % (SAVE_PATH)
     plt.savefig(save_path, dpi=200)
 
     #compute spearman's rho
-    rho = spearmanr(np.argsort(score[0]),np.argsort(score[1]))
+    rho = spearmanr(np.argsort(logits[0]),np.argsort(logits[1]))
     print(rho)
 
 

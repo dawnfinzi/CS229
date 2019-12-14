@@ -42,14 +42,14 @@ def main():
 
     layer_names = [
         'conv3',
-        'conv4',
-        'conv5',
+        #'conv4',
+        #'conv5',
     ]
 
     tensor_names = [
         'conv_2',
-        'conv_3',
-        'conv_4',
+        #'conv_3',
+        #'conv_4',
     ]
 
     alexnet_kwargs = {

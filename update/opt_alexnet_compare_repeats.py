@@ -91,11 +91,11 @@ def main():
     tf_saver_restore.restore(sess, CKPT_PATH)
 
     # run the tensors
-    score = sess.run(fc8_outputs)
+    logits = sess.run(fc8_outputs)
     # apply softmax to output
-    probs = np.zeros((score.shape))
-    for col in range(len(score)): #ugly but works
-        probs[col,:] = softmax(score[col,:])
+    probs = np.zeros((logits.shape))
+    for col in range(len(logits)): #ugly but works
+        probs[col,:] = softmax(logits[col,:])
     winning_class = (np.argmax(probs,1)) #top 1
     print(winning_class)
     # get top 5 and compute overlap
@@ -108,16 +108,16 @@ def main():
     print((overlap/total)*100) #percent overlap
 
     # visualize the probs across repeats
-    plt.figure(figsize = (20, 5))
-    plt.imshow(score[:,1:100])
-    plt.set_ylabel('Repeats')
-    plt.set_xlabel('Class probabilities for the first 100 classes')
-    plt.set_title("Class probabilities across repeated optimizations")
-    save_path = "%s/alexnet_repeats_visualize_class_probs.png" % (SAVE_PATH)
+    fig,ax = plt.subplots(figsize=(20, 5))
+    img = ax.imshow(logits[:,1:100])
+    ax.set_xlabel('Class logits for the first 100 classes')
+    ax.set_title("Class logits across repeated optimizations")
+    fig.colorbar(img, ax=ax)
+    save_path = "%s/alexnet_repeats_visualize_class_logits.png" % (SAVE_PATH)
     plt.savefig(save_path, dpi=200)
 
     #get one spearman's rho as a baseline
-    baseline_rho = spearmanr(np.argsort(probs[0]),np.argsort(probs[1]))
+    baseline_rho = spearmanr(np.argsort(logits[0]),np.argsort(logits[1]))
     print(baseline_rho)
 
 
