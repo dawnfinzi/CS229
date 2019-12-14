@@ -30,7 +30,7 @@ def main():
 
     fig, axes = plt.subplots(figsize=(25, 5), nrows=1, ncols=5)
 
-    loss = None
+    loss = 'TV'
     preproc = True
 
     params = {
@@ -40,6 +40,14 @@ def main():
         'steps': 1000, # 2048,
         'loss': loss,
         #'loss_lambda': 1.0,
+    }
+
+    preproc_params = {
+        'pad': 20, #12,
+        'scale': True,
+        'rotate': True,
+        'pre_jitter': 8,
+        'post_jitter': 8,
     }
 
     layer_names = [
@@ -71,6 +79,7 @@ def main():
             CKPT_PATH,
             params,
             preproc,
+            preproc_params, 
             layer_name=None,
         )
 

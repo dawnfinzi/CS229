@@ -16,6 +16,7 @@ from losses import total_variation_loss
 
 def preprocess(
     images,
+    preproc_params,
 ):
     """
     Takes in an image tensor and completes the Lucid preprocessing steps
@@ -27,11 +28,23 @@ def preprocess(
     scales = [1 + (i - 5) / 50. for i in range(11)]
     angles = list(range(-10, 11)) + 5 * [0]
 
-    images = xforms.pad(images, pad_amount=12)
-    images = xforms.jitter(images, jitter_amount=8)
-    images = xforms.random_scale(images, scales)
-    images = xforms.random_rotate(images, angles)
-    images = xforms.jitter(images, jitter_amount=4)
+    if preproc_params is None:
+        images = xforms.pad(images, pad_amount=12)
+        images = xforms.jitter(images, jitter_amount=8)
+        images = xforms.random_scale(images, scales)
+        images = xforms.random_rotate(images, angles)
+        images = xforms.jitter(images, jitter_amount=4)
+    else:
+        if 'pad' in preproc_params:
+            images = xforms.pad(images,pad_amount=preproc_params['pad'])
+        if 'pre_jitter' in preproc_params:
+            images = xforms.jitter(images, jitter_amount=preproc_params['pre_jitter'])
+        if ('scale' in preproc_params) and (preproc_params['scale'] is True):
+            images = xforms.random_scale(images, scales)
+        if ('rotate' in preproc_params) and (preproc_params['rotate'] is True):
+            images = xforms.random_rotate(images, angles)
+        if 'post_jitter' in preproc_params:
+            images = xforms.jitter(images, jitter_amount=preproc_params['post_jitter'])
 
     return images
 
@@ -71,6 +84,7 @@ def get_optimal_image(
     checkpoint_path,
     params,
     preproc=True,
+    preproc_params=None,
     layer_name=None,
     image_resolution=128
 ):
@@ -89,6 +103,13 @@ def get_optimal_image(
             - optional: "loss" (str) - what loss function to use (default is just L2 regulariation). 
             - optional: "loss_lambda" (int) - constant to scale additional loss by (default is 1)
         preproc (bool): whether or not to preprocess the images ala lucid (default is True)
+        preproc_params (dict): if preproc_params not included, default to lucid transform
+            keys include
+            - "pad": amount to pad by
+            - "scale": to scale or not (bool)
+            - "rotate": to rotate or not (bool)
+            - "pre_jitter": how much to jitter the image before scaling and rotating
+            - "post_jitter": how much to jitter the image at the end of preprocessing
         layer_name (str): which to layer to get image for
         image_resolution (int): how many pixels to make the image on each side
         
@@ -106,7 +127,7 @@ def get_optimal_image(
 
     # preprocess the images
     if preproc is True:
-        images = preprocess(images)
+        images = preprocess(images,preproc_params)
         
     # get features for a given layer from a given model
     tensor_name = params.get('tensor_name', None)
