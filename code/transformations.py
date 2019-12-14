@@ -2,7 +2,6 @@
 List of transformations to apply to the image, heavily inspired by Lucid
 source code: https://github.com/tensorflow/lucid/blob/master/lucid/optvis/transform.py
 
-Credit to Eshed Margalit
 '''
 
 import tensorflow as tf

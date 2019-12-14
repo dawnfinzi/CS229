@@ -26,13 +26,13 @@ def main():
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"] = FLAGS.gpu
 
-    fig, axes = plt.subplots(figsize=(40, 5), nrows=1, ncols=5)
+    fig, axes = plt.subplots(figsize=(40, 5), nrows=1, ncols=10)
 
     loss = 'TV'
     preproc = True
 
     params = {
-        'channel':0,
+        'channel':11,
         'learning_rate': .05,
         'regularization': 0.0001,
         'steps': 1000, # 2048,
