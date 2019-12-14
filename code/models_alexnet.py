@@ -1,6 +1,5 @@
 """
-Defines CNN architectures
-(Credit to Eshed Margalit)
+Defines Alexnet architectures
 """
 
 import ipdb

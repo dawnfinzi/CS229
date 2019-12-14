@@ -1,3 +1,8 @@
+"""
+Defines architecture for FaceNet
+
+"""
+
 import os
 import sys
 sys.path.append('../models/')
@@ -82,26 +87,11 @@ def inception_resnet_v1_opt(inputs, is_training=True,
                 net = block8(net, activation_fn=None)
                 end_points['Mixed_8b'] = net
                 
-                #with tf.variable_scope('Logits'):
-                #    end_points['PrePool'] = net
-                    #pylint: disable=no-member
-                #    net = slim.avg_pool2d(net, net.get_shape()[1:3], padding='VALID',
-                #                          scope='AvgPool_1a_8x8')
-                #    net = slim.flatten(net)
-          
-                #    net = slim.dropout(net, dropout_keep_prob, is_training=is_training,
-                #                       scope='Dropout')
-          
-                #    end_points['PreLogitsFlatten'] = net
-                
-                #net = slim.fully_connected(net, bottleneck_layer_size, activation_fn=None, 
-                #        scope='Bottleneck', reuse=False)
-  
     return net, end_points
 
 def facenet_wrapper(images, layer_name, **kwargs):
     print(layer_name)
-    net, model_outputs = inception_resnet_v1(images, is_training=False)#,reuse=tf.AUTO_REUSE)
+    net, model_outputs = inception_resnet_v1(images, is_training=False)
     layer = model_outputs[layer_name]
     return layer
 

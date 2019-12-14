@@ -1,6 +1,7 @@
 """
 Defines CNN architectures
-(Credit to Eshed Margalit)
+
+Credit to Eshed Margalit
 """
 import ipdb
 import os
